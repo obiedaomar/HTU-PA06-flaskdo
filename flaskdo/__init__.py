@@ -35,6 +35,8 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    # TODO: Register your blueprints here.
+    # TODO: Register your blueprints here :).
+    from .views import login
+    app.register_blueprint(login.bp)
 
     return app
