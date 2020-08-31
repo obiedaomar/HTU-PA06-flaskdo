@@ -1,6 +1,6 @@
 # Class User
 
-def class User:
+class User:
 
     def __init__(self, email, password):
 
@@ -10,4 +10,3 @@ def class User:
         self.last_name = ""
         self.email = email
         self.password = password
-
