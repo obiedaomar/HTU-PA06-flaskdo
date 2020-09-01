@@ -39,4 +39,13 @@ def create_app(test_config=None):
     from .views import login
     app.register_blueprint(login.bp)
 
+    from .views import index
+    app.register_blueprint(index.bp)
+
+    from .views import task_list
+    app.register_blueprint(task_list.bp)
+
+    from .views import task
+    app.register_blueprint(task.bp)
+
     return app
