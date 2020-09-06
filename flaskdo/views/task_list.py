@@ -8,11 +8,6 @@ bp = Blueprint('task_list', __name__)
 
 @bp.route('/mylists', methods=['GET'])
 def mylists():
-    if 'uid' in session:
-        is_logged_in = True
-    else:
-        is_logged_in = False
-
     # get the db connection
     db = get_db()
 
@@ -21,7 +16,7 @@ def mylists():
         # execute the SQL query
         mylists = db.execute(
             "SELECT * FROM TaskList WHERE user_id=?;", (str(session['uid']))).fetchall()
-        return render_template('task-lists/task-lists.html', is_logged_in=is_logged_in, mylists=mylists)
+        return render_template('task-lists/task-lists.html', mylists=mylists)
 
     except sqlite3.Error as er:
         print('SQLite error: %s' % (' '.join(er.args)))
@@ -31,12 +26,7 @@ def mylists():
 @bp.route('/add/list', methods=['GET', 'POST'])
 def add_list():
     if request.method == 'GET':
-        if 'uid' in session:
-            is_logged_in = True
-        else:
-            is_logged_in = False
-
-        return render_template('task-lists/add-task-list.html', is_logged_in=is_logged_in)
+        return render_template('task-lists/add-task-list.html')
     else:
         list_name = request.form['list-name']
         list_description = request.form['list-description']
@@ -58,3 +48,39 @@ def add_list():
         except sqlite3.Error as er:
             print('SQLite error: %s' % (' '.join(er.args)))
             return redirect("/404")
+
+
+@bp.route('/list/<int:tasklist_id>')
+def view_list(tasklist_id):
+
+    # find the task list
+
+    # get db connection
+    db = get_db()
+
+    # fetch task list
+    try:
+        # execute the SQL query
+        tasklist = db.execute(
+            "SELECT * FROM TaskList WHERE id=? AND user_id=?;", (tasklist_id, session['uid'])).fetchone()
+
+        # if the tasklist was found
+        if tasklist:
+            tl_name = tasklist['name']
+            tl_description = tasklist['description']
+
+            # execute the SQL query
+            tasks = db.execute(
+                "SELECT * FROM Task WHERE task_list_id=?;", (tasklist_id,)).fetchall()
+
+            # render_template to 'task-list'
+            return render_template('task-lists/task-list.html', tl_name=tl_name, tl_description=tl_description, tasks=tasks)
+
+        # if the tasklist was not found
+        else:
+            # redirect to 404
+            return redirect("/403")
+
+    except sqlite3.Error as er:
+        print('SQLite error: %s' % (' '.join(er.args)))
+        return redirect("/403")

@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session, url_for
 from ..db import get_db
 from ..models.priority import Priority
 
@@ -10,36 +10,53 @@ bp = Blueprint('task', __name__)
 @bp.route('/add/task', methods=['GET', 'POST'])
 def add_task():
     if request.method == 'GET':
-        if 'uid' in session:
-            is_logged_in = True
-        else:
-            is_logged_in = False
-
         priorities = {
             Priority.LOW.value: Priority.LOW.name,
             Priority.MEDIUM.value: Priority.MEDIUM.name,
             Priority.HIGH.value: Priority.HIGH.name
         }
 
-        return render_template('tasks/add-task.html', is_logged_in=is_logged_in, priorities=priorities)
+        # get db connection
+        db = get_db()
+
+        # fetch the user task lists
+        try:
+            # execute the SQL query
+            task_lists = db.execute(
+                "SELECT id, name FROM TaskList WHERE user_id=?;", (session['uid'],)).fetchall()
+
+            # if the user was found
+            if task_lists:
+                # render_template to 'add-task'
+                return render_template('tasks/add-task.html', priorities=priorities, task_lists=task_lists)
+
+            # if no task lists were found
+            else:
+                # render the login page with an error message
+                return redirect("/404")
+        except sqlite3.Error as er:
+            print('SQLite error: %s' % (' '.join(er.args)))
+            return redirect("/404")
+
     else:
-        list_name = request.form['list-name']
-        list_description = request.form['list-description']
-        user_id = session['uid']
+        title = request.form['task-title']
+        description = request.form['task-description']
+        priority = request.form['prioritySelect']
+        task_list_id = request.form['taskListSelect']
 
         # get the db connection
         db = get_db()
 
-        # insert user into db
+        # insert task into db
         try:
             # execute the SQL query
             db.execute(
-                "INSERT INTO TaskList (name, description, user_id) VALUES (?, ?, ?);", (list_name, list_description, user_id))
+                "INSERT INTO Task (title, description, priority, task_list_id) VALUES (?, ?, ?, ?);", (title, description, priority, task_list_id))
 
             # commit the changes to the DB
             db.commit()
 
-            return redirect('/mylists')
+            return redirect(url_for('task_list.view_list', tasklist_id=task_list_id))
         except sqlite3.Error as er:
             print('SQLite error: %s' % (' '.join(er.args)))
             return redirect("/404")

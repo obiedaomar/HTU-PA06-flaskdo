@@ -1,4 +1,6 @@
 DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS TaskList;
+DROP TABLE IF EXISTS Task;
 
 -- Create 'User' table
 CREATE TABLE User (
@@ -25,5 +27,5 @@ CREATE TABLE Task (
   title TEXT NOT NULL,
   priority INTEGER NOT NULL,
   description TEXT,
-  FOREIGN KEY (task_list_id) REFERENCES user (id)
+  FOREIGN KEY (task_list_id) REFERENCES taskList (id)
 );

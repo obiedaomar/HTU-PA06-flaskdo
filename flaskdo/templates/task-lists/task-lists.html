@@ -1,14 +1,18 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container-fluid">
-  <h1 class="container-fluid py-4">Contact List</h1>
-
+  <h1 class="py-4">Task List</h1>
+  <h2><a href="{{url_for('task_list.add_list')}}">+ Add List</a></h2>
   <div class="container d-flex">
     {% for list in mylists %}
     <div class="card ml-2 mr-2" style="width: 22rem">
       <div class="card-body">
         <h5 class="card-title">{{list.name}}</h5>
         <p class="card-text">{{list.description}}</p>
-        <a href="#" class="btn btn-primary">View tasks</a>
+        <a
+          href="{{url_for('task_list.view_list', tasklist_id= list.id)}}"
+          class="btn btn-primary"
+          >View tasks</a
+        >
       </div>
     </div>
     {% endfor %}
