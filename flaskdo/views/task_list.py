@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session, url_for
 from ..db import get_db
 
 # define our blueprint
@@ -50,6 +50,49 @@ def add_list():
             return redirect("/404")
 
 
+@bp.route('/update/list/<int:tasklist_id>', methods=['GET', 'POST'])
+def update_list(tasklist_id):
+    # get db connection
+    db = get_db()
+
+    # fetch task list
+    try:
+        # execute the SQL query
+        tasklist = db.execute(
+            "SELECT * FROM TaskList WHERE id=? AND user_id=?;", (tasklist_id, session['uid'])).fetchone()
+
+        # if the tasklist was found
+        if tasklist:
+
+            if request.method == 'GET':
+                # render the update list form with pre-populated values
+                return render_template('task-lists/update-list.html', tasklist=tasklist)
+            else:
+
+                # read the values from the update list form
+                name = request.form['list-name']
+                description = request.form['list-description']
+
+                # execute the SQL query
+                db.execute(
+                    "UPDATE TaskList SET name=?, description=? WHERE id=?;", (name, description, tasklist_id))
+
+                # write changes to the DB
+                db.commit()
+
+                # redirect to the 'view_list' view
+                return redirect(url_for('task_list.view_list', tasklist_id=tasklist_id))
+
+        # if the tasklist was not found
+        else:
+            # redirect to 404
+            return redirect("/404")
+
+    except sqlite3.Error as er:
+        print('SQLite error: %s' % (' '.join(er.args)))
+        return redirect("/403")
+
+
 @bp.route('/list/<int:tasklist_id>')
 def view_list(tasklist_id):
 
@@ -79,8 +122,40 @@ def view_list(tasklist_id):
         # if the tasklist was not found
         else:
             # redirect to 404
-            return redirect("/403")
+            return redirect("/404")
 
     except sqlite3.Error as er:
         print('SQLite error: %s' % (' '.join(er.args)))
-        return redirect("/403")
+        return redirect("/404")
+
+
+@bp.route('/delete/list/<int:tasklist_id>')
+def delete_list(tasklist_id):
+    # get db connection
+    db = get_db()
+
+    # fetch task list
+    try:
+        # execute the SQL query
+        tasklist = db.execute(
+            "SELECT * FROM TaskList WHERE id=? AND user_id=?;", (tasklist_id, session['uid'])).fetchone()
+
+        # if the tasklist was found
+        if tasklist:
+            # execute the SQL query
+            db.execute("DELETE FROM TaskList WHERE id=?;", (tasklist_id,))
+
+            # write changes to the DB
+            db.commit()
+
+            # redirect to the 'view_list' view
+            return redirect(url_for('task_list.mylists'))
+
+        # if the tasklist was not found
+        else:
+            # redirect to 404
+            return redirect("/404")
+
+    except sqlite3.Error as er:
+        print('SQLite error: %s' % (' '.join(er.args)))
+        return redirect("/404")
