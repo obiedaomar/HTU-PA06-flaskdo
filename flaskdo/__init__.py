@@ -53,6 +53,13 @@ def create_app(test_config=None):
             return True
         return False
 
+     # register template global function
+    @app.template_global()
+    def get_first_name():
+        if 'first_name' in session:
+            return session['first_name']
+        return "User"
+
     # import helper DB functions
     from . import db
     db.init_app(app)
@@ -69,5 +76,8 @@ def create_app(test_config=None):
 
     from .views import task
     app.register_blueprint(task.bp)
+
+    from .views import profile
+    app.register_blueprint(profile.bp)
 
     return app
