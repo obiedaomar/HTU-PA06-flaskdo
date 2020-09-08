@@ -3,7 +3,7 @@
   <head>
     {% block head %}
     <meta charset="utf-8" />
-    <title>{% block title %}Signup{% endblock %}</title>
+    <title>{% block title %}FlaskDo{% endblock %}</title>
     <link
       rel="icon"
       type="image/x-icon"
@@ -23,7 +23,7 @@
   <body class="d-flex flex-column h-100">
     <!-- navigation section -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="">FlaskDo</a>
+      <a class="navbar-brand" href="/">FlaskDo</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -37,19 +37,21 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        {% if username %}
+        {% if is_logged_in() %}
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="">Contacts</a>
+            <a class="nav-link" href="{{url_for('task_list.mylists')}}"
+              >My Task Lists</a
+            >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">Add Contact</a>
+            <a class="nav-link" href="{{url_for('task.mytasks')}}">My Tasks</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="">Profile</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">Logout</a>
+            <a class="nav-link" href="{{url_for('login.logout')}}">Logout</a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0" method="POST" action="">
@@ -67,10 +69,10 @@
         {% else %}
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="">Login</a>
+            <a class="nav-link" href="{{url_for('login.login')}}">Login</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">Signup</a>
+            <a class="nav-link" href="{{url_for('login.signup')}}">Signup</a>
           </li>
         </ul>
         {% endif %}

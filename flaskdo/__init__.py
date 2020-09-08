@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, session, render_template
 
 
 def create_app(test_config=None):
@@ -31,6 +31,28 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
+    # 403 error handler
+    @app.errorhandler(403)
+    def page_not_found(e):
+        return render_template('errors/403.html'), 403
+
+    # 404 error handler
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('errors/404.html'), 404
+
+    # 500 error handler
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('errors/500.html'), 500
+
+    # register template global function
+    @app.template_global()
+    def is_logged_in():
+        if 'uid' in session:
+            return True
+        return False
+
     # import helper DB functions
     from . import db
     db.init_app(app)
@@ -38,5 +60,14 @@ def create_app(test_config=None):
     # TODO: Register your blueprints here :).
     from .views import login
     app.register_blueprint(login.bp)
+
+    from .views import index
+    app.register_blueprint(index.bp)
+
+    from .views import task_list
+    app.register_blueprint(task_list.bp)
+
+    from .views import task
+    app.register_blueprint(task.bp)
 
     return app

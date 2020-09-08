@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container-fluid">
+  <h1 class="py-4">{{tl_name}}</h1>
+  <h4 class="py-4">{{tl_description}}</h4>
+  <div class="container py-2">
+    <div class="row justify-content-between">
+      <div class="col-md-8 mb-3">
+        <h3>Tasks</h3>
+      </div>
+      <div class="col-md-4 mb-3">
+        <!-- Button trigger modal -->
+        <a href="{{url_for('task.add_task')}}" class="btn btn-primary">+</a>
+      </div>
+    </div>
+    <div class="row justify-content-between">
+      <div class="col-md-12 mb-3">
+        {% if tasks %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Title</th>
+              <th scope="col">Description</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+            <tr>
+              <th scope="row">{{loop.index}}</th>
+              <td>{{task.title}}</td>
+              <td>{{task.description}}</td>
+              <td>
+                <a href=""
+                  ><svg
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 16 16"
+                    class="bi bi-binoculars"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"
+                    />
+                  </svg>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <h5>This list has no tasks.</h5>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock%}
