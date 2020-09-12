@@ -60,6 +60,7 @@ def login():
             if user and user['password'] == password:
                 # store the user ID in the session
                 session['uid'] = user['id']
+                session['first_name'] = user['first_name']
 
                 # redirect to index
                 return redirect('/')

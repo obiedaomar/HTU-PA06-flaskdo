@@ -8,6 +8,9 @@ CREATE TABLE User (
   first_name TEXT,
   last_name TEXT,
   email TEXT UNIQUE NOT NULL,
+  avatarURL TEXT,
+  birthdate TEXT,
+  address TEXT,
   password TEXT NOT NULL
 );
 
