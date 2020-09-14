@@ -16,10 +16,14 @@ def signup():
     # when the user submits the form over the HTTP POST
     else:
         # read values from form
+        firstname = request.form['firstname']
+        lastname = request.form['lastname']
         email = request.form['email']
         password = request.form['password']
-
-        print(f"Storing {email} and {password}.")
+        avatarURL=request.form['avatarURL']
+        birthdate=request.form['birthdate']
+        address=request.form['address']
+        # print(f"Storing {email} and {password}.")
 
         # get the db connection
         db = get_db()
@@ -28,7 +32,7 @@ def signup():
         try:
             # execute the SQL query
             db.execute(
-                "INSERT INTO User (email, password) VALUES (?, ?);", (email, password))
+                "INSERT INTO User (firstname,lastname,email, password,avatarURL,birthdate,address) VALUES (?,?,?, ?,?,?,?);", (firstname,lastname,email, password,avatarURL,birthdate,address))
 
             # commit the changes to the DB
             db.commit()
@@ -60,10 +64,10 @@ def login():
             if user and user['password'] == password:
                 # store the user ID in the session
                 session['uid'] = user['id']
-                session['first_name'] = user['first_name']
+                session['firstname'] = user['firstname']
 
                 # redirect to index
-                return redirect('/')
+                return redirect('/profile')
             # if the user was not found
             else:
                 # render the login page with an error message

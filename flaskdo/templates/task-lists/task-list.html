@@ -21,6 +21,15 @@
               <th scope="col">#</th>
               <th scope="col">Title</th>
               <th scope="col">Description</th>
+              <th scope="col">priority</th>
+              <th scope="col">Task Creation</th>
+              <th scope="col">Last Updated</th>
+              
+
+              <th scope="col" colspan="3">Share</th>
+
+
+
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -30,8 +39,28 @@
               <th scope="row">{{loop.index}}</th>
               <td>{{task.title}}</td>
               <td>{{task.description}}</td>
+              <td>{{task.priority}}</td>
+              <td>{{task.created}}</td>
+              
+              <td><span class="badge badge-primary">{{task.tags}}</span>
+              </td>
+
               <td>
-                <a href=""
+                <a href="#" class="fa fa-facebook"></a>
+
+                </td>
+                <td>
+                  <a href="#" class="fa fa-twitter"></a>
+  
+                  </td>
+                  <td>
+                    <a href="#" class="fa fa-whatsapp"></a>
+    
+                    </td>
+
+
+              <td>
+                <a href="{{url_for('task.update_task', task_id= task.id)}}"
                   ><svg
                     width="1em"
                     height="1em"

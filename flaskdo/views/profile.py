@@ -1,16 +1,22 @@
 import sqlite3
-from flask import Blueprint, render_template, request, redirect, session, url_for
+from flask import Flask,Blueprint, render_template, request, redirect, session, url_for
 from ..models.user import User
 from ..db import get_db
+from werkzeug.utils import secure_filename
 
 # define our blueprint
 bp = Blueprint('profile', __name__)
-
+UPLOAD_FOLDER = '/path/to/the/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @bp.route('/profile')
 def view_profile():
     # get db connection
     db = get_db()
+    tasklist = db.execute(
+            "SELECT * FROM TaskList WHERE user_id=?;",(session['uid'],))
 
     # fetch user
     try:
@@ -21,7 +27,7 @@ def view_profile():
         # if the user was found
         if user:
             # redirect to index
-            return render_template('profile/profile.html', user=user)
+            return render_template('profile/profile.html', user=user,tasklists=tasklist)
         # if the user was not found
         else:
             # render the login page with an error message
@@ -49,17 +55,19 @@ def edit_profile():
                 return render_template('profile/edit-profile.html', user=user)
             else:
                 email = request.form['email']
-                first_name = request.form['first-name']
-                last_name = request.form['last-name']
+                firstname = request.form['firstname']
+                lastname = request.form['lastname']
                 birthdate = request.form['birthdate']
-                avatarURL = request.form['avatarURL']
+                avatarURL = request.files['avatarURL']
+                avatarURL.save(secure_filename(avatarURL.filename))
                 address = request.form['address']
 
                 db.execute(
-                    "UPDATE User SET email=?, first_name=?, last_name=?, birthdate=?, avatarURL=?, address=? WHERE id=?;", (email, first_name, last_name, birthdate, avatarURL, address, session['uid'],)).fetchone()
+                    "UPDATE User SET email=?, firstname=?, lastname=?, birthdate=?, avatarURL=?, address=? WHERE id=?;", (email, firstname, lastname, birthdate, avatarURL, address, session['uid'],)).fetchone()
 
                 db.commit()
                 return redirect(url_for('profile.view_profile'))
+                # session['firstname']=firstname
         # if the user was not found
         else:
             # render the login page with an error message
@@ -86,3 +94,23 @@ def delete_profile():
     except sqlite3.Error as er:
         print('SQLite error: %s' % (' '.join(er.args)))
         return redirect("/404")
+
+
+@bp.route('/profile/changepassword',methods=['GET', 'POST'])
+def change_password():
+    if request.method=="GET":
+        return render_template("profile/change_password.html")
+    else:
+        change_password=request.form['change_password']
+
+        # get db
+        db=get_db()
+        try:
+            db.execute("UPDATE USER SET password=? WHERE id=?;",(change_password,session['uid'],)).fetchone()
+            db.commit()
+            print("password is ",change_password)
+            return redirect("/login")
+
+        except sqlite3.Error as er:
+            print('SQLite error: %s' % (' '.join(er.args)))
+            return redirect("/404")

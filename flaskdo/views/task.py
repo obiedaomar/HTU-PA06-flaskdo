@@ -2,10 +2,11 @@ import sqlite3
 from flask import Blueprint, render_template, request, redirect, session, url_for
 from ..db import get_db
 from ..models.priority import Priority
+from datetime import datetime
 
 # define our blueprint
 bp = Blueprint('task', __name__)
-
+update_date=datetime.now()
 priorities = {
     Priority.LOW.value: Priority.LOW.name,
     Priority.MEDIUM.value: Priority.MEDIUM.name,
@@ -52,7 +53,7 @@ def add_task():
         try:
             # execute the SQL query
             db.execute(
-                "INSERT INTO Task (title, description, priority, task_list_id) VALUES (?, ?, ?, ?);", (title, description, priority, task_list_id))
+                "INSERT INTO Task (title, description,priority, task_list_id) VALUES ( ?, ?,?,?);", (title, description,priority, task_list_id))
 
             # commit the changes to the DB
             db.commit()
@@ -88,8 +89,8 @@ def update_task(task_id):
                 task_list_id = request.form['taskListSelect']
 
                 # update task in DB
-                tasks = db.execute('UPDATE Task SET title=?, description=?, priority=?, task_list_id=? WHERE id = ?', (
-                    title, description, priority, task_list_id, task_id,))
+                tasks = db.execute('UPDATE Task SET title=?, description=?, priority=?,task_list_id=? WHERE id = ?', (
+                    title, description, priority,task_list_id, task_id,))
 
                 # write changes to DB
                 db.commit()
@@ -118,11 +119,10 @@ def view_task(task_id):
         # execute the SQL query
         task = db.execute(
             "SELECT * FROM Task WHERE id=?", (task_id,)).fetchone()
-
         # if the tasklist was found
         if task:
             # render_template to 'tasks/view-task.html'
-            return render_template('tasks/view-task.html', task=task)
+            return render_template('tasks/view-task.html', task=task,update_date=update_date)
 
         # if the tasklist was not found
         else:
@@ -143,7 +143,7 @@ def mytasks():
     try:
         # execute the SQL query
         tasks = db.execute(
-            'SELECT t.id, t.title, t.description, tl.id, tl.name FROM TaskList tl JOIN Task t ON tl.user_id = ? AND tl.id = t.task_list_id',
+            'SELECT t.id, t.title, t.description,t.tags,t.due,tl.id, tl.name FROM TaskList tl JOIN Task t ON tl.user_id = ? AND tl.id = t.task_list_id',
             (session['uid'],))
 
         return render_template('tasks/mytasks.html', tasks=tasks)

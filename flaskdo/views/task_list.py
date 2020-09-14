@@ -1,6 +1,8 @@
 import sqlite3
 from flask import Blueprint, render_template, request, redirect, session, url_for
 from ..db import get_db
+from datetime import datetime
+
 
 # define our blueprint
 bp = Blueprint('task_list', __name__)
@@ -115,9 +117,11 @@ def view_list(tasklist_id):
             # execute the SQL query
             tasks = db.execute(
                 "SELECT * FROM Task WHERE task_list_id=?;", (tasklist_id,)).fetchall()
+            update_date=datetime.now()
+
 
             # render_template to 'task-list'
-            return render_template('task-lists/task-list.html', tl_name=tl_name, tl_description=tl_description, tasks=tasks)
+            return render_template('task-lists/task-list.html', tl_name=tl_name, tl_description=tl_description, tasks=tasks,update_date=update_date)
 
         # if the tasklist was not found
         else:
