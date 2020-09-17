@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head %}
+    <meta charset="utf-8" />
+    <title>{% block title %}FlaskDo{% endblock %}</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+    />
+
+    {% block styles %}
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+
+    {% endblock %} {% endblock %}
+  </head>
+  <body class="d-flex flex-column h-100">
+    <!-- navigation section -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">FlaskDo</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {% if is_logged_in() %}
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('task_list.mylists')}}"
+              >My Task Lists</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('task.mytasks')}}">My Tasks</a>
+          </li>
+        </ul>
+
+        <ul class="navbar-nav">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Hello, {{get_first_name()}}!
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a
+                class="dropdown-item"
+                href="{{url_for('profile.view_profile')}}"
+                >Profile</a
+              >
+
+              <a class="dropdown-item" href="{{url_for('login.logout')}}"
+                >Logout</a
+              >
+            </div>
+          </div>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login.login')}}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login.signup')}}">Signup</a>
+          </li>
+        </ul>
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- main section -->
+    <main>
+      {% for message in get_flashed_messages() %}
+      <div class="container">
+        <div
+          class="alert alert-warning alert-dismissible fade show"
+          role="alert"
+        >
+          <strong>Holy guacamole!</strong> {{message}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+      <div>{% block content %}{% endblock %}</div>
+    </main>
+
+    <!-- footer section -->
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+      <p class="mb-1">© 2020 FlaskDo</p>
+      <ul class="list-inline">
+        <li class="list-inline-item"><a href="#">Privacy</a></li>
+        <li class="list-inline-item"><a href="#">Terms</a></li>
+        <li class="list-inline-item"><a href="#">Support</a></li>
+      </ul>
+    </footer>
+    {% block scripts %}
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
+
+    {% endblock %}
+  </body>
+</html>
